@@ -4,7 +4,13 @@
 
 @push('styles')
 <style>
-    .create-form { max-width: 900px; }
+    .create-form { width: 100%; max-width: 100%; }
+    .create-form .form-row, .create-form .form-row-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .create-form .form-control, .create-form select, .create-form input { max-width: 100%; min-width: 0; box-sizing: border-box; }
+    @media (max-width: 600px) {
+        .create-form .create-header > div:last-child { margin-left: 0 !important; text-align: left !important; }
+        .create-form .card-header { flex-wrap: wrap; gap: 8px; }
+    }
     .section-title {
         font-size: 13px;
         font-weight: 700;
@@ -30,16 +36,16 @@
 
 @section('content')
 <div class="create-form">
-    <div style="margin-bottom:20px;display:flex;align-items:center;gap:16px;">
+    <div class="create-header" style="margin-bottom:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div>
+            <div style="font-size:18px;font-weight:800;">{{ $report ? 'Edit Laporan ' . $report->report_number : 'Input Laporan Reject Baru' }}</div>
+            <div style="font-size:12px;color:var(--text-secondary)">Departemen <b style="color:var(--secondary)">IOL</b></div>
+        </div>
         @if($report)
             <a href="{{ route('operator.reports.show', $report) }}" class="btn btn-outline btn-sm"><i class="fas fa-arrow-left"></i> Kembali</a>
         @else
             <a href="{{ route('operator.reports.index') }}" class="btn btn-outline btn-sm"><i class="fas fa-list-alt"></i> Riwayat</a>
         @endif
-        <div>
-            <div style="font-size:18px;font-weight:800;">{{ $report ? 'Edit Laporan ' . $report->report_number : 'Input Laporan Reject Baru' }}</div>
-            <div style="font-size:12px;color:var(--text-secondary)">Departemen: <b id="deptLabel" style="color:var(--secondary)">{{ ucfirst($department) }}</b></div>
-        </div>
         <div style="margin-left:auto;text-align:right;">
             @if($report)
                 <div style="font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.5px;">Disubmit</div>
@@ -89,18 +95,18 @@
                 <div class="form-row form-row-3">
                     <div class="form-group">
                         <label class="form-label required">Jenis Material</label>
-                        <input type="text" name="product_name" class="form-control" value="{{ old('product_name', $report->product_name ?? '') }}" placeholder="e.g. Lens Case Type A" required>
+                        <input type="text" name="product_name" class="form-control" value="{{ old('product_name', $report->product_name ?? '') }}" placeholder="" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Batch Material</label>
-                        <input type="text" name="product_code" class="form-control" value="{{ old('product_code', $report->product_code ?? '') }}" placeholder="e.g. LC-001">
+                        <input type="text" name="product_code" class="form-control" value="{{ old('product_code', $report->product_code ?? '') }}" placeholder="1">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label required">Total Qty Produksi</label>
-                        <input type="number" name="total_production_qty" class="form-control" value="{{ old('total_production_qty', $report->total_production_qty ?? '') }}" placeholder="Contoh: 1000" min="1" required onchange="updateSummary()">
+                        <input type="number" name="total_production_qty" class="form-control" value="{{ old('total_production_qty', $report->total_production_qty ?? '') }}" placeholder="" min="1" required onchange="updateSummary()">
                     </div>
                 </div>
             </div>
@@ -199,8 +205,6 @@ function updateSummary() {
 
 function updateDefectTypes(dept) {
     currentDept = dept;
-    const lbl = document.getElementById('deptLabel');
-    if (lbl) lbl.textContent = dept.charAt(0).toUpperCase() + dept.slice(1);
     document.querySelectorAll('[name$="[defect_type]"]').forEach(sel => {
         const current = sel.value;
         sel.innerHTML = '<option value="">-- Pilih Jenis --</option>' + buildDefectOptions(dept);
@@ -219,7 +223,20 @@ function tickClock() {
 setInterval(tickClock, 1000);
 tickClock();
 
-// Init with one row
-addDefectRow();
+// Init rows (prefill saat edit / setelah error validasi)
+const existingDetails = @json($existingDetails ?? []);
+if (existingDetails.length) {
+    existingDetails.forEach(d => {
+        addDefectRow();
+        const i = defectCount - 1;
+        const set = (n, v) => { const el = document.querySelector(`[name="details[${i}][${n}]"]`); if (el && v != null) el.value = v; };
+        set('defect_type', d.defect_type);
+        set('quantity', d.quantity);
+        set('description', d.description);
+    });
+    updateSummary();
+} else {
+    addDefectRow();
+}
 </script>
 @endpush

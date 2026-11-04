@@ -684,9 +684,11 @@
     @stack('styles')
 </head>
 <body>
+@php $isOp = auth()->user()->isOperator(); @endphp
 <div class="app-layout">
 
     {{-- Sidebar --}}
+    @unless($isOp)
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-icon"><i class="fas fa-chart-line"></i></div>
@@ -760,16 +762,23 @@
             </form>
         </div>
     </aside>
+    @endunless
 
     {{-- Main --}}
-    <div class="main-content">
+    <div class="main-content" @if($isOp) style="margin-left:0" @endif>
         <header class="topbar">
             <div>
-                <div class="topbar-title">@yield('page-title', 'Dashboard')</div>
-                <div class="topbar-breadcrumb">RMRS / <span>@yield('page-title', 'Dashboard')</span></div>
+                <div class="topbar-title">{{ $isOp ? auth()->user()->name : View::yieldContent('page-title', 'Dashboard') }}</div>
+                <div class="topbar-breadcrumb">RMRS / <span>{{ $isOp ? auth()->user()->role_display : View::yieldContent('page-title', 'Dashboard') }}</span></div>
             </div>
             <div class="topbar-right">
                 <div class="topbar-time" id="topbarClock">{{ now()->format('H:i:s') }}</div>
+                @if($isOp)
+                <form method="POST" action="{{ route('logout') }}" style="margin:0">
+                    @csrf
+                    <button type="submit" class="btn-logout" style="width:auto;padding:8px 14px;"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+                </form>
+                @endif
             </div>
         </header>
 

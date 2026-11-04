@@ -10,7 +10,8 @@
             <div style="font-size:18px;font-weight:800;">{{ $report->report_number }}</div>
             <div style="font-size:12px;color:var(--text-secondary)">Dibuat: {{ $report->created_at->format('d F Y H:i') }}</div>
         </div>
-        <div style="margin-left:auto;">
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+            <a href="{{ route('operator.reports.edit', $report) }}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit Laporan</a>
             <span class="badge badge-{{ $report->status }}" style="font-size:13px;padding:6px 16px;">
                 {{ $report->status_display }}
             </span>
@@ -26,13 +27,11 @@
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
                 @php
                     $fields = [
-                        ['Departemen', $report->department_display],
+                        ['Material', $report->department_display],
                         ['Shift', $report->shift_display],
                         ['Tanggal Produksi', $report->production_date->format('d F Y')],
-                        ['Nama Produk', $report->product_name],
-                        ['Kode Produk', $report->product_code ?: '-'],
-                        ['Lot Number', $report->lot_number ?: '-'],
-                        ['No. Mesin', $report->machine_number ?: '-'],
+                        ['Jenis Material', $report->product_name],
+                        ['Batch#', $report->product_code ?: '-'],
                         ['Qty Produksi', number_format($report->total_production_qty) . ' pcs'],
                         ['Operator', $report->operator->name],
                         ['Waktu Submit', ($report->submitted_at ?? $report->created_at)->format('d/m/Y H:i:s')],
@@ -48,25 +47,6 @@
         </div>
     </div>
 
-    {{-- Summary reject --}}
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;" class="fade-in fade-in-2">
-        <div class="stat-card yellow">
-            <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
-            <div class="stat-value">{{ number_format($report->total_reject_qty) }}</div>
-            <div class="stat-label">Total Qty Reject</div>
-        </div>
-        <div class="stat-card {{ $report->reject_percentage > 5 ? 'red' : ($report->reject_percentage > 2 ? 'yellow' : 'green') }}">
-            <div class="stat-icon"><i class="fas fa-percent"></i></div>
-            <div class="stat-value">{{ $report->reject_percentage }}%</div>
-            <div class="stat-label">Persentase Reject</div>
-        </div>
-        <div class="stat-card purple">
-            <div class="stat-icon"><i class="fas fa-list"></i></div>
-            <div class="stat-value">{{ $report->details->count() }}</div>
-            <div class="stat-label">Jenis Defect</div>
-        </div>
-    </div>
-
     {{-- Detail defect --}}
     <div class="card fade-in fade-in-3" style="margin-bottom:16px;">
         <div class="card-header">
@@ -78,9 +58,7 @@
                     <tr>
                         <th>#</th>
                         <th>Jenis Defect</th>
-                        <th>Kategori</th>
                         <th>Qty (pcs)</th>
-                        <th>Lokasi</th>
                         <th>Deskripsi</th>
                     </tr>
                 </thead>
@@ -89,9 +67,7 @@
                     <tr>
                         <td style="color:var(--text-secondary)">{{ $i + 1 }}</td>
                         <td><b>{{ $detail->defect_type }}</b></td>
-                        <td><span class="badge badge-{{ $detail->defect_category }}">{{ $detail->category_display }}</span></td>
                         <td><b style="color:var(--warning);font-family:JetBrains Mono,monospace">{{ number_format($detail->quantity) }}</b></td>
-                        <td style="color:var(--text-secondary)">{{ $detail->defect_location ?: '-' }}</td>
                         <td style="color:var(--text-secondary)">{{ $detail->description ?: '-' }}</td>
                     </tr>
                     @endforeach

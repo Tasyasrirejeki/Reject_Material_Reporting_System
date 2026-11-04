@@ -55,8 +55,8 @@
                         <th>Tgl Produksi</th>
                         <th>Waktu Submit</th>
                         <th>Shift</th>
-                        <th>Departemen</th>
-                        <th>Nama Produk</th>
+                        <th>Material</th>
+                        <th>Jenis Material</th>
                         <th>Qty Reject</th>
                         <th>Jml Defect</th>
                         <th>Status</th>
@@ -78,6 +78,9 @@
                         <td>
                             <a href="{{ route('operator.reports.show', $report) }}" class="btn btn-outline btn-sm">
                                 <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ route('operator.reports.edit', $report) }}" class="btn btn-outline btn-sm" title="Edit">
+                                <i class="fas fa-edit"></i>
                             </a>
                         </td>
                     </tr>

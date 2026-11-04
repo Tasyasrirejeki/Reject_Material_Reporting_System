@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
 
         // Operator bisa bekerja di Lenscase maupun Pouching (department = 'all')
         $operator1 = User::create([
-            'name' => 'Citra Operator',
+            'name' => 'Tasya Sri Rejeki',
             'email' => 'operator1@rmrs.com',
             'password' => Hash::make('password'),
             'role' => 'operator',
@@ -42,7 +42,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $operator2 = User::create([
-            'name' => 'Deni Operator',
+            'name' => 'Bayu Irawan',
             'email' => 'operator2@rmrs.com',
             'password' => Hash::make('password'),
             'role' => 'operator',
